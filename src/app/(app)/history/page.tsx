@@ -76,16 +76,16 @@ export default function HistoryPage() {
   }
 
   // --- EXPORT FUNCTIONALITY (PDF & Word Enhanced) ---
-
-  async function handleExport(quoteId: string, type: 'pdf' | 'word') {
+async function handleExport(quoteId: string, type: 'pdf' | 'word') {
     setExportingId(quoteId);
     setOpenDropdownId(null);
     try {
       const res = await loadQuote(quoteId);
       if (!res) throw new Error('Could not load proforma details.');
       
-      const quote = res.quote || res;
-      const lines = res.lines || quote.lines || [];
+      // loadQuote returns { quote: Quote, lines: QuoteLineRow[] }
+      const quote = res.quote;
+      const lines = res.lines || [];
       const customerName = quote.customer_name || 'Customer';
       const quoteNum = formatProformaNumber(quote.number || 1);
       const filename = `Proforma_${quoteNum}_${customerName.replace(/\s+/g, '_')}`;
