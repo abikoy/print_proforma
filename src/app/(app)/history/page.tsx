@@ -201,8 +201,9 @@ async function handleExport(quoteId: string, type: 'pdf' | 'word') {
       styles: {
         fontSize: 9,
         textColor: [15, 23, 42],
-        borderColor: [203, 213, 225],
-        cellPadding: 3,
+      lineColor: [203, 213, 225],
+       lineWidth: 0.2,
+          cellPadding: 3,
       },
     });
 
@@ -424,7 +425,7 @@ async function handleExport(quoteId: string, type: 'pdf' | 'word') {
                           </Button>
 
                           {openDropdownId === q.id && (
-                            <div className="absolute right-0 z-20 mt-1 w-36 rounded-md border border-line bg-surface p-1 shadow-lg">
+                            <div className="absolute right-0 z-20 mt-1 w-36 rounded-md border border-line bg-card p-1 shadow-lg">
                               <button
                                 onClick={() => handleExport(q.id, 'pdf')}
                                 className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs text-ink hover:bg-elevated"
