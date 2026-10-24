@@ -1,0 +1,50 @@
+/*
+  PrintQuote design tokens.
+  Values are "R G B" channels so Tailwind can add opacity (bg-primary/10).
+  Change brand colors here and nowhere else.
+*/
+:root {
+  color-scheme: light;
+
+  --canvas: 243 246 250;      /* #F3F6FA page background */
+  --card: 255 255 255;        /* #FFFFFF cards and forms */
+  --elevated: 248 250 252;    /* raised / hover surface */
+  --ink: 23 43 77;            /* #172B4D headings */
+  --body: 51 65 85;           /* #334155 body text */
+  --muted: 100 116 139;       /* #64748B secondary text */
+  --line: 226 232 240;        /* #E2E8F0 borders */
+  --navy: 23 43 77;           /* #172B4D navigation bar */
+
+  --primary: 15 118 110;      /* #0F766E button fill (5.5:1 with white text) */
+  --primary-fg: 255 255 255;  /* text on primary */
+  --accent: 13 148 136;       /* #0D9488 teal for icons, borders, highlights */
+  --tint: 224 247 243;        /* selected / active background */
+
+  --success: 21 128 61;       /* #15803D */
+  --warning: 180 83 9;        /* #B45309 */
+  --danger: 185 28 28;        /* #B91C1C */
+  --info: 29 78 216;          /* #1D4ED8 */
+}
+
+.dark {
+  color-scheme: dark;
+
+  --canvas: 11 18 32;         /* #0B1220 */
+  --card: 17 28 46;           /* #111C2E */
+  --elevated: 36 50 71;       /* #243247 */
+  --ink: 226 232 240;         /* #E2E8F0 */
+  --body: 203 213 225;        /* #CBD5E1 */
+  --muted: 148 163 184;       /* #94A3B8 */
+  --line: 51 65 85;           /* #334155 */
+  --navy: 17 28 46;
+
+  --primary: 94 234 212;      /* #5EEAD4 teal accent as button fill */
+  --primary-fg: 11 18 32;     /* dark text on the bright teal */
+  --accent: 94 234 212;
+  --tint: 19 52 60;
+
+  --success: 74 222 128;      /* #4ADE80 */
+  --warning: 251 191 36;      /* #FBBF24 */
+  --danger: 248 113 113;      /* #F87171 */
+  --info: 96 165 250;         /* #60A5FA */
+}

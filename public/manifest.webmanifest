@@ -1,0 +1,12 @@
+{
+  "name": "PrintQuote",
+  "short_name": "PrintQuote",
+  "description": "Proforma calculator for print shops",
+  "start_url": "/new-proforma",
+  "display": "standalone",
+  "background_color": "#F3F6FA",
+  "theme_color": "#172B4D",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
