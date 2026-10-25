@@ -398,7 +398,7 @@ async function handleExport(quoteId: string, type: 'pdf' | 'word') {
                 {filtered.map((q) => (
                   <tr key={q.id} className="hover:bg-elevated">
                     <td className="px-4 py-3 font-semibold text-ink">
-                      <Link href={`/report/${q.id}`} className="hover:underline">
+                      <Link href={`/report/${q.id}?view=1`} className="hover:underline">
                         {formatProformaNumber(q.number)}
                       </Link>
                     </td>
@@ -407,7 +407,7 @@ async function handleExport(quoteId: string, type: 'pdf' | 'word') {
                     <td className="px-4 py-3 text-right font-semibold tabular-nums text-ink">{formatMoney(q.total)}</td>
                     <td className="whitespace-nowrap px-4 py-3 text-right">
                       <div className="inline-flex items-center gap-1">
-                        <Link href={`/report/${q.id}`}>
+                      <Link href={`/report/${q.id}?view=1`}>
                           <Button size="sm" variant="secondary">
                             <Eye className="h-4 w-4" aria-hidden /> View / Print
                           </Button>

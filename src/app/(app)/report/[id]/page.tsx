@@ -1,8 +1,8 @@
 'use client';
 
-import { FilePlus2, Pencil, Printer } from 'lucide-react';
+import {ArrowLeft, FilePlus2, Pencil, Printer } from 'lucide-react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams  } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ProformaDocument } from '@/components/report/ProformaDocument';
 import { Button } from '@/components/ui/Button';
@@ -16,6 +16,7 @@ import type { Quote, QuoteLineRow } from '@/types';
 export default function ReportPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+    const viewOnly = useSearchParams().get('view') === '1';
   const { reset, loadQuote: startEditing } = useDraft();
   const [data, setData] = useState<{ quote: Quote; lines: QuoteLineRow[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -51,32 +52,42 @@ export default function ReportPage() {
 
   return (
     <div>
-      <div className="print:hidden">
-        <Stepper current={5} />
+           <div className="print:hidden">
+        {!viewOnly && <Stepper current={5} />}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-muted">Saved. Use Print to print on A4 or choose “Save as PDF” in the print window.</p>
+          {viewOnly ? (
+            <Link href="/history" className="inline-flex items-center gap-2 text-sm text-accent hover:underline">
+              <ArrowLeft className="h-4 w-4" aria-hidden /> Back to History
+            </Link>
+          ) : (
+            <p className="text-sm text-muted">Saved. Use Print to print on A4 or choose “Save as PDF” in the print window.</p>
+          )}
           <div className="flex flex-wrap gap-2">
             <Button onClick={() => window.print()}>
               <Printer className="h-4 w-4" aria-hidden /> Print / Save as PDF
             </Button>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                startEditing(data.quote, data.lines, false);
-                router.push('/new-proforma');
-              }}
-            >
-              <Pencil className="h-4 w-4" aria-hidden /> Edit Quote
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                reset();
-                router.push('/new-proforma');
-              }}
-            >
-              <FilePlus2 className="h-4 w-4" aria-hidden /> New Quote
-            </Button>
+            {!viewOnly && (
+              <>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    startEditing(data.quote, data.lines, false);
+                    router.push('/new-proforma');
+                  }}
+                >
+                  <Pencil className="h-4 w-4" aria-hidden /> Edit Quote
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    reset();
+                    router.push('/new-proforma');
+                  }}
+                >
+                  <FilePlus2 className="h-4 w-4" aria-hidden /> New Quote
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
