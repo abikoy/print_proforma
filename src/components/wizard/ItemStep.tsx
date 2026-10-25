@@ -97,17 +97,31 @@ export function ItemStep() {
 
   const canAdd = !!variant && qtyOk && !problem;
 
-  function submit() {
+    function submit() {
     if (!category || !variant || !canAdd) return;
+
+    // The same product, size, note and lamination already in the cart? Add to it instead of a new line.
+    const same = editing
+      ? null
+      : draft.lines.find(
+          (l) =>
+            l.variantId === variant.id &&
+            l.categoryId === category.id &&
+            l.laminated === laminated &&
+            l.note === note.trim() &&
+            Math.abs((l.widthCm ?? 0) - (widthCm ?? 0)) < 0.0001 &&
+            Math.abs((l.heightCm ?? 0) - (heightCm ?? 0)) < 0.0001,
+        ) ?? null;
+
     const line = buildLine({
-      id: editing?.id ?? uid(),
+      id: editing?.id ?? same?.id ?? uid(),
       category,
       variant,
       widthCm,
       heightCm,
       note,
       laminated,
-      quantity,
+      quantity: same ? same.quantity + quantity : quantity,
       discount,
       unit,
     });
