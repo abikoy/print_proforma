@@ -1,12 +1,14 @@
 import { Card } from '@/components/ui/Card';
 import { formatETB, formatMoney } from '@/lib/format';
 import type { LineResult, PricingMethod } from '@/lib/pricing/calc';
+import { areaLabel, cm2PerUnit2, type Unit } from '@/lib/pricing/units';
 
 interface Props {
   result: LineResult | null;
   areaCm2: number;
   quantity: number;
   method: PricingMethod | null;
+  unit?: Unit;
 }
 
 function Row({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
@@ -19,8 +21,7 @@ function Row({ label, value, strong }: { label: string; value: string; strong?: 
 }
 
 /** Live price preview, updates as the user changes size, lamination or quantity. */
-export function PricePanel({ result, areaCm2, quantity, method }: Props) {
-  return (
+export function PricePanel({ result, areaCm2, quantity, method, unit = 'cm' }: Props) {  return (
     <Card className="lg:sticky lg:top-24" aria-live="polite">
       <h3 className="text-base font-semibold text-ink">Price</h3>
       {!result ? (
@@ -28,7 +29,7 @@ export function PricePanel({ result, areaCm2, quantity, method }: Props) {
       ) : (
         <>
           <dl className="mt-2 divide-y divide-line">
-            {method === 'per_cm2' && <Row label="Area" value={`${Number(areaCm2.toFixed(2))} cm²`} />}
+            {method === 'per_cm2' && <Row label="Area" value={`${Number((areaCm2 / cm2PerUnit2(unit)).toFixed(2))} ${areaLabel(unit)}`}/>}
             <Row label="Paper per piece" value={formatETB(result.baseUnit)} />
             {result.laminationUnit > 0 && <Row label="Lamination per piece" value={formatETB(result.laminationUnit)} />}
             <Row label="Before discount" value={formatETB(result.preDiscountUnit)} />

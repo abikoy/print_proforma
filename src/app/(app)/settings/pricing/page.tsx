@@ -9,21 +9,23 @@ import { useData } from '@/features/data/DataContext';
 import { parseNonNegative, useSettingsSave } from '@/features/settings/useSettingsSave';
 import { formatETB, formatRate } from '@/lib/format';
 import { areaCm2 } from '@/lib/pricing';
+import { areaLabel, rateFromUnit, rateToUnit, type Unit } from '@/lib/pricing/units';
 import { supabase } from '@/lib/supabase/client';
 import type { Variant } from '@/types';
 
 export default function PricingSettingsPage() {
-  const { categories, variants } = useData();
-  const save = useSettingsSave();
+  const { categories, variants, unitFor } = useData();
+    const save = useSettingsSave();
   const toast = useToast();
 
-  function commit(v: Variant, field: 'rate' | 'lamination_rate', text: string) {
+    function commit(v: Variant, field: 'rate' | 'lamination_rate', text: string, unit: Unit) {
     const n = parseNonNegative(text);
     if (n === null) {
       toast.error('Enter a number of 0 or more.');
       return;
     }
-    return save(() => supabase.from('variants').update({ [field]: n }).eq('id', v.id));
+    const stored = v.pricing_method === 'per_cm2' ? rateFromUnit(n, unit) : n;
+    return save(() => supabase.from('variants').update({ [field]: stored }).eq('id', v.id));
   }
 
   return (
@@ -31,7 +33,7 @@ export default function PricingSettingsPage() {
       <Card>
         <h2 className="text-base font-semibold text-ink">Pricing rules</h2>
         <p className="mt-1 text-sm text-muted">
-          Rates are in ETB. For <strong>per cm²</strong> options the rate and the lamination rate are charged for every cm² of the piece. For <strong>fixed price</strong> options the rate
+          Rates are in ETB. For <strong>per-area</strong> options (shown per m², cm², etc. as set for each category). the rate and the lamination rate are charged for every cm² of the piece. For <strong>fixed price</strong> options the rate
           is the price of one piece and the lamination rate is a flat extra per piece. Changes save when you leave a field, and each one is recorded in the Price change log.
         </p>
       </Card>
@@ -44,6 +46,7 @@ export default function PricingSettingsPage() {
 
       {categories.map((c) => {
         const options = variants.filter((v) => v.category_id === c.id);
+                const unit = unitFor(c.id);
         if (options.length === 0) return null;
         return (
           <Card key={c.id} className="!p-0">
@@ -70,12 +73,12 @@ export default function PricingSettingsPage() {
                     return (
                       <tr key={v.id}>
                         <td className="px-5 py-2 font-medium text-ink">{v.name}</td>
-                        <td className="px-3 py-2 text-muted">{perArea ? 'per cm²' : 'fixed per piece'}</td>
+                        <td className="px-3 py-2 text-muted">{perArea ? `per ${areaLabel(unit)}` : 'fixed per piece'}</td>
                         <td className="w-36 px-3 py-2">
-                          <CommitInput aria-label={`Rate for ${v.name}`} inputMode="decimal" value={formatRate(v.rate)} onCommit={(t) => commit(v, 'rate', t)} />
+                          <CommitInput aria-label={`Rate for ${v.name}`} inputMode="decimal" value={formatRate(perArea ? rateToUnit(v.rate, unit) : v.rate)} onCommit={(t) => commit(v, 'rate', t, unit)} />
                         </td>
                         <td className="w-36 px-3 py-2">
-                          <CommitInput aria-label={`Lamination rate for ${v.name}`} inputMode="decimal" value={formatRate(v.lamination_rate)} onCommit={(t) => commit(v, 'lamination_rate', t)} />
+                          <CommitInput aria-label={`Lamination rate for ${v.name}`} inputMode="decimal" value={formatRate(perArea ? rateToUnit(v.lamination_rate, unit) : v.lamination_rate)} onCommit={(t) => commit(v, 'lamination_rate', t, unit)} />
                         </td>
                         <td className="px-3 py-2 text-right tabular-nums text-body">{known ? formatETB(base) : 'size needed'}</td>
                         <td className="px-5 py-2 text-right tabular-nums text-body">{known ? formatETB(base + lam) : 'size needed'}</td>

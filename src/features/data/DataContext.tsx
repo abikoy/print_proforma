@@ -15,7 +15,9 @@ interface DataState {
   shop: ShopProfile | null;
   loading: boolean;
   error: string | null;
-  unit: Unit;
+    unit: Unit;
+  /** Unit for one category: its own unit, or the default. */
+  unitFor: (categoryId?: string | null) => Unit;
   discount: DiscountSettings;
   /** Re-reads everything from the database. Call after saving in Settings. */
   reload: () => Promise<void>;
@@ -76,6 +78,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       loading,
       error,
       unit: settings?.unit ?? 'cm',
+      unitFor: (categoryId?: string | null): Unit => categories.find((c) => c.id === categoryId)?.unit ?? settings?.unit ?? 'cm',
       discount: settings
         ? {
             startQty: settings.discount_start_qty,

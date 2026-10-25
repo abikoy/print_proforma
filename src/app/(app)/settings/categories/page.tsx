@@ -13,11 +13,12 @@ import { useToast } from '@/components/ui/Toast';
 import { useData } from '@/features/data/DataContext';
 import { useSettingsSave } from '@/features/settings/useSettingsSave';
 import { formatDimension, toCm } from '@/lib/pricing';
+import { areaLabel } from '@/lib/pricing/units';
 import { supabase } from '@/lib/supabase/client';
 import type { Category, PricingMethod, SizeMode, Variant } from '@/types';
 
 export default function CategoriesSettingsPage() {
-  const { categories, variants, unit } = useData();
+  const { categories, variants, unitFor  } = useData();
   const save = useSettingsSave();
   const toast = useToast();
 
@@ -33,6 +34,7 @@ export default function CategoriesSettingsPage() {
   }, [categories, selectedId]);
 
   const selected = categories.find((c) => c.id === selectedId) ?? null;
+    const unit = unitFor(selectedId);
   const options = variants.filter((v) => v.category_id === selectedId);
 
   async function addCategory(e: FormEvent) {
@@ -200,7 +202,7 @@ export default function CategoriesSettingsPage() {
                           maxLength={80}
                           onCommit={(t) => (t.trim() ? updateVariant(v.id, { name: t.trim() }) : toast.error('An option needs a name.'))}
                         />
-                        {needsSize && <p className="mt-1 text-xs text-warning">Width and height are needed for per cm² pricing.</p>}
+                        {needsSize && <p className="mt-1 text-xs text-warning">Width and height are needed for per {areaLabel(unit)} pricing.</p>}
                       </td>
                       {selected.size_mode === 'preset' && (
                         <>
@@ -228,7 +230,7 @@ export default function CategoriesSettingsPage() {
                           value={v.pricing_method}
                           onChange={(e) => updateVariant(v.id, { pricing_method: e.target.value as PricingMethod })}
                         >
-                          <option value="per_cm2">Per cm²</option>
+                          <option value="per_cm2">Per {areaLabel(unit)}</option>
                           <option value="fixed">Fixed price per piece</option>
                         </Select>
                       </td>

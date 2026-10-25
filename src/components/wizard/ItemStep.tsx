@@ -12,6 +12,7 @@ import { buildLine } from '@/features/quotes/buildLine';
 import { cn } from '@/lib/cn';
 import { formatRate } from '@/lib/format';
 import { areaCm2, computeLine, formatDimension, formatSize, toCm } from '@/lib/pricing';
+import { areaLabel, rateToUnit } from '@/lib/pricing/units';
 import { uid } from '@/lib/uid';
 import { PricePanel } from './PricePanel';
 
@@ -24,10 +25,11 @@ function parsePositive(text: string): number | null {
 }
 
 export function ItemStep() {
-  const { categories, variants, unit, discount } = useData();
-  const { draft, update, upsertLine } = useDraft();
+  const { categories, variants, unitFor, discount } = useData();
+    const { draft, update, upsertLine } = useDraft();
 
   const category = categories.find((c) => c.id === draft.categoryId) ?? null;
+    const unit = unitFor(category?.id);
   const options = useMemo(() => variants.filter((v) => v.category_id === category?.id), [variants, category?.id]);
   const editing = draft.lines.find((l) => l.id === draft.editingLineId) ?? null;
 
@@ -157,7 +159,7 @@ export function ItemStep() {
                         <span className="block text-sm font-semibold text-ink">{v.name}</span>
                         {!custom && size && <span className="block text-sm text-body">{size}</span>}
                         <span className="mt-1 block text-xs text-muted">
-                          {v.pricing_method === 'per_cm2' ? `ETB ${formatRate(v.rate)} per cm²` : `Fixed ETB ${formatRate(v.rate)} per piece`}
+                       {v.pricing_method === 'per_cm2' ? `ETB ${formatRate(rateToUnit(v.rate, unit))} per ${areaLabel(unit)}` : `Fixed ETB ${formatRate(v.rate)} per piece`}
                         </span>
                       </button>
                     </li>
@@ -196,7 +198,7 @@ export function ItemStep() {
                 <span className="block text-xs text-muted">
                   {variant
                     ? variant.pricing_method === 'per_cm2'
-                      ? `ETB ${formatRate(variant.lamination_rate)} per cm²`
+                     ? `ETB ${formatRate(rateToUnit(variant.lamination_rate, unit))} per ${areaLabel(unit)}`
                       : `ETB ${formatRate(variant.lamination_rate)} per piece`
                     : 'Priced from your settings'}
                 </span>
@@ -222,7 +224,7 @@ export function ItemStep() {
         </div>
 
         <div className="space-y-4">
-          <PricePanel result={result} areaCm2={area} quantity={qtyOk ? quantity : 0} method={variant?.pricing_method ?? null} />
+          <PricePanel result={result} areaCm2={area} quantity={qtyOk ? quantity : 0} method={variant?.pricing_method ?? null} unit={unit} />
           <Button size="lg" block disabled={!canAdd} onClick={submit}>
             {editing ? (
               <>

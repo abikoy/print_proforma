@@ -11,7 +11,7 @@ import { UNITS, UNIT_NAMES, type Unit } from '@/lib/pricing/units';
 import { supabase } from '@/lib/supabase/client';
 
 export default function MeasurementVatPage() {
-  const { settings } = useData();
+  const { settings, categories } = useData();
   const { user } = useAuth();
   const save = useSettingsSave();
 
@@ -47,8 +47,7 @@ export default function MeasurementVatPage() {
     <Card>
       <h2 className="text-base font-semibold text-ink">Measurement and VAT</h2>
       <div className="mt-5 grid gap-5 sm:grid-cols-2">
-        <Field label="Unit for sizes" htmlFor="unit" hint="Only changes how sizes are typed and shown. Prices stay per cm², so nothing needs converting.">
-          <Select id="unit" value={unit} onChange={(e) => setUnit(e.target.value as Unit)}>
+        <Field label="Default unit for sizes" htmlFor="unit" hint="Used by every category that has no unit of its own (set below). Prices are stored per cm², so nothing needs converting.">          <Select id="unit" value={unit} onChange={(e) => setUnit(e.target.value as Unit)}>
             {UNITS.map((u) => (
               <option key={u} value={u}>
                 {UNIT_NAMES[u]}
@@ -64,8 +63,38 @@ export default function MeasurementVatPage() {
         </Field>
       </div>
       <Button className="mt-6" loading={saving} disabled={!changed || !!vatError || !!daysError} onClick={onSave}>
-        Save settings
+                Save settings
       </Button>
+
+      <div className="mt-8 border-t border-line pt-6">
+        <h3 className="text-base font-semibold text-ink">Unit for each category</h3>
+        <p className="mt-1 text-sm text-muted">
+          Choose the unit a category is measured and priced in. For example Banners in metres (price per m²) and Business Cards in cm. “Default” uses the unit above. These save as soon as you pick one.
+        </p>
+        {categories.length === 0 && <p className="mt-3 text-sm text-muted">No categories yet.</p>}
+        <ul className="mt-3 divide-y divide-line rounded-xl border border-line">
+          {categories.map((c) => (
+            <li key={c.id} className="flex flex-wrap items-center justify-between gap-3 p-3">
+              <span className="text-sm font-medium text-ink">{c.name}</span>
+              <Select
+                aria-label={`Unit for ${c.name}`}
+                className="w-56"
+                value={c.unit ?? ''}
+                onChange={(e) =>
+                  save(() => supabase.from('categories').update({ unit: e.target.value === '' ? null : e.target.value }).eq('id', c.id), 'Unit saved')
+                }
+              >
+                <option value="">Default ({UNIT_NAMES[unit]})</option>
+                {UNITS.map((u) => (
+                  <option key={u} value={u}>
+                    {UNIT_NAMES[u]}
+                  </option>
+                ))}
+              </Select>
+            </li>
+          ))}
+        </ul>
+      </div>
     </Card>
   );
 }

@@ -1,6 +1,7 @@
 import type { PricingMethod } from '@/lib/pricing/calc';
 import type { Unit } from '@/lib/pricing/units';
 
+
 export type { PricingMethod, Unit };
 export type SizeMode = 'preset' | 'custom';
 
@@ -16,6 +17,7 @@ export interface Category {
   icon: string;
   size_mode: SizeMode;
   sort_order: number;
+  unit: Unit | null;
 }
 
 export interface Variant {

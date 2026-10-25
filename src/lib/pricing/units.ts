@@ -45,3 +45,14 @@ export function formatSize(widthCm: number | null, heightCm: number | null, unit
   if (!widthCm || !heightCm) return '';
   return `${formatDimension(widthCm, unit)} x ${formatDimension(heightCm, unit)} ${unit}`;
 }
+/** How many cm² are in one square unit (1 m² = 10,000 cm²). */
+export const cm2PerUnit2 = (u: Unit) => CM_PER_UNIT[u] ** 2;
+
+/** Stored rate (per cm²) to the rate shown per square unit. */
+export const rateToUnit = (perCm2: number, u: Unit) => Number((perCm2 * cm2PerUnit2(u)).toFixed(6));
+
+/** Rate typed per square unit to the stored rate per cm². */
+export const rateFromUnit = (perUnit2: number, u: Unit) => Number((perUnit2 / cm2PerUnit2(u)).toFixed(6));
+
+/** "m²", "cm²", "in²" */
+export const areaLabel = (u: Unit) => (u === 'inch' ? 'in²' : `${u}²`);
